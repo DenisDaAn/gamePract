@@ -8,12 +8,24 @@ public class PlayerController : MonoBehaviour
     public static bool tap, swipeLeft, swipeRight, swipeUp, swipeDown;
     public float timeLeft;
     public bool isGrounded = true;
+    public float speed = 1;
+    private float lastChek = 1;
+
+    [SerializeField] private GameObject losePanel;
 
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        transform.position += new Vector3(0, 0, 1 * Time.deltaTime);
+        speed = speed + Time.deltaTime / 100;
+        transform.position += new Vector3(0, 0, speed * Time.deltaTime);
+        
+        if (lastChek - transform.position.z == 0)
+        {
+            losePanel.SetActive(true);
+            Time.timeScale = 0;
+        }
+        lastChek = transform.position.z;
 
     }
 
@@ -23,7 +35,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
         {
             isGrounded = false;
-            GetComponent<Rigidbody>().AddForce(new Vector3(0, 100, 0));
+            GetComponent<Rigidbody>().AddForce(new Vector3(0, 150, 0));
             timeLeft = 0.5f;
             
         }
@@ -31,6 +43,7 @@ public class PlayerController : MonoBehaviour
         if (timeLeft <= 0)
         {
             isGrounded = true;
+
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
@@ -45,11 +58,19 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    
-    
+
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.tag == "obstacle")
+        {
+            losePanel.SetActive(true);
+            Time.timeScale = 0;
+        }
+    }
 
 
 
-    
+
 
 }
